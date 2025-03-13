@@ -15,7 +15,10 @@ Future<String?> loginWithGitHub() async{
     "scope": "repo"
   });
 
-  final result = await FlutterWebAuth2.authenticate(url: authUrl.toString(), callbackUrlScheme: "gmemo",);
+  final result = await FlutterWebAuth2.authenticate(
+    url: authUrl.toString(),
+    callbackUrlScheme: "gmemo",
+  );
 
   //  一時的なアクセスコードを取得
   final code = Uri.parse(result).queryParameters["code"];
