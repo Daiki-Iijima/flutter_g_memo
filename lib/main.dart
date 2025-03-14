@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:g_memo/models/GitHubFile.dart';
-import 'package:g_memo/screens/git_hub_auth.dart';
 import 'package:g_memo/widgets/github_logins.dart';
 import 'package:g_memo/widgets/repository_lists.dart';
 import 'package:g_memo/screens/select_edit_files.dart';
@@ -157,13 +156,6 @@ class _EntryScreenState extends State<EntryScreen> {
     });
   }
 
-  @override
-  void initState() {
-    super.initState();
-    //  以前ログインしていれば読み込まれる
-    _loadAccessToken();
-  }
-
   void _getAccessTokenHandler(String accessToken) async {
     //  アクセストークンをSecureStorageに保存
     await _storage.write(key: _githubTokenKey, value: accessToken);
@@ -213,6 +205,13 @@ class _EntryScreenState extends State<EntryScreen> {
         },
       ),
     );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //  以前ログインしていれば読み込まれる
+    _loadAccessToken();
   }
 
   @override
