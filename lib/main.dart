@@ -64,11 +64,42 @@ class _EntryScreenState extends State<EntryScreen> {
   }
 
   void _logout() {
-    _storage.delete(key: _githubTokenKey);
-    //  キーを削除
-    setState(() {
-      _accessToken = null;
-    });
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("ログアウトしますか？"),
+          actions: [
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Cancel"),
+                ),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () {
+                    _storage.delete(key: _githubTokenKey);
+                    //  キーを削除
+                    setState(() {
+                      _accessToken = null;
+                    });
+
+                    //  リポジトリ一覧を削除
+                    _repos.clear();
+
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("OK"),
+                ),
+              ],
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _getRepositories(String token) async {
@@ -140,6 +171,9 @@ class _EntryScreenState extends State<EntryScreen> {
     setState(() {
       _accessToken = accessToken;
     });
+
+    //  リポジトリ一覧を取得
+    _getRepositories(accessToken);
   }
 
   void _onSelectedRepositoryHandler(GithubRepo repo) async {
