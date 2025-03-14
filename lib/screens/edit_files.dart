@@ -54,7 +54,7 @@ class _EditFileScreenState extends State<EditFileScreen> {
             controller: _controller,
             maxLines: null, // 複数行に対応
             decoration: InputDecoration(
-              border: InputBorder.none, // 🔥 下線を消す
+              border: InputBorder.none, // 下線を消す
               contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),
             onChanged: (value) {
