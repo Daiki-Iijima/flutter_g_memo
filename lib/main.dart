@@ -75,36 +75,53 @@ class _EntryScreenState extends State<EntryScreen> {
     setState(() {
       _loadingRepos = true;
     });
-    //  試しにリポジトリの一覧を取得
-    final response = await http.get(
-      Uri.parse("https://api.github.com/user/repos"),
-      headers: {
-        "Authorization": "token $token",
-        "Accept": "application/vnd.github.v3+json",
-      },
-    );
 
-    if (response.statusCode == 200) {
-      final repos = List<Map<String, dynamic>>.from(json.decode(response.body));
-      for (final repo in repos) {
-        _repos.add(
-          GithubRepo(
-            owner: repo["owner"]["login"],
-            name: repo["name"],
-            contentsUrl: repo["contents_url"].replaceAll('{+path}', ''),
-            isPrivate: repo["private"] == "private",
-          ),
-        );
-        // 検証用
-        for (final k in repo.keys) {
-          print("${k.toString()} : ${repo[k.toString()]}");
+    List<GithubRepo> allRepos = [];
+    int page = 1;
+    bool hasMore = true;
+
+    while (hasMore) {
+      final response = await http.get(
+        Uri.parse("https://api.github.com/user/repos?per_page=100&page=$page"),
+        headers: {
+          "Authorization": "token $token",
+          "Accept": "application/vnd.github.v3+json",
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final List<Map<String, dynamic>> repos =
+            List<Map<String, dynamic>>.from(json.decode(response.body));
+
+        for (final repo in repos) {
+          allRepos.add(
+            GithubRepo(
+              owner: repo["owner"]["login"],
+              name: repo["name"],
+              contentsUrl: repo["contents_url"].replaceAll('{+path}', ''),
+              isPrivate: repo["private"] == true, // 修正: true/false の直接判定
+            ),
+          );
+
+          // 検証用ログ
+          for (final k in repo.keys) {
+            print("${k.toString()} : ${repo[k.toString()]}");
+          }
         }
+
+        if (repos.length < 100) {
+          hasMore = false; // 100件未満ならもうリポジトリはない
+        } else {
+          page++; // 次のページを取得
+        }
+      } else {
+        print("リポジトリ一覧の取得に失敗: ${response.statusCode}");
+        hasMore = false;
       }
-    } else {
-      print("リポジトリ一覧の取得に失敗");
     }
 
     setState(() {
+      _repos.addAll(allRepos);
       _loadingRepos = false;
     });
   }
