@@ -1,8 +1,7 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:g_memo/models/GitHubFile.dart';
+
+import '../admob/ad_banner_widget.dart';
 
 class EditFileScreen extends StatefulWidget {
   final GitHubFile file;
@@ -62,6 +61,7 @@ class _EditFileScreenState extends State<EditFileScreen> {
           },
         ),
       ),
+      bottomNavigationBar: const AdBannerWidget(), // 広告表示
     );
   }
 }

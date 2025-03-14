@@ -8,6 +8,8 @@ import 'package:g_memo/screens/edit_files.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
+import '../admob/ad_banner_widget.dart';
+
 class SelectEditFileScreen extends StatefulWidget {
   final List<GitHubFile> contents;
 
@@ -176,6 +178,7 @@ class _SelectEditFileScreenState extends State<SelectEditFileScreen> {
           ),
         ],
       ),
+      bottomNavigationBar: const AdBannerWidget(), // 広告表示
     );
   }
 }

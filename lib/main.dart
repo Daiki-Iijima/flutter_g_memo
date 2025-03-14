@@ -2,15 +2,21 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:g_memo/admob/ad_banner_widget.dart';
 import 'package:g_memo/models/GitHubFile.dart';
+import 'package:g_memo/screens/select_edit_files.dart';
 import 'package:g_memo/widgets/github_logins.dart';
 import 'package:g_memo/widgets/repository_lists.dart';
-import 'package:g_memo/screens/select_edit_files.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:http/http.dart' as http;
 
 import 'models/GitHubRepo.dart';
 
 void main() {
+  //  AdMobの初期化
+  WidgetsFlutterBinding.ensureInitialized();
+  MobileAds.instance.initialize();
+
   runApp(const GMemoApp());
 }
 
@@ -245,6 +251,7 @@ class _EntryScreenState extends State<EntryScreen> {
         ],
       ),
       body: mainContent,
+      bottomNavigationBar: const AdBannerWidget(), // 広告表示
     );
   }
 }

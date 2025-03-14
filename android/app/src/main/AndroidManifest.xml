@@ -32,6 +32,12 @@
         <meta-data
                 android:name="flutterEmbedding"
                 android:value="2" />
+
+        <!-- AdMob用 -->
+        <!--        とりあえずテスト広告用idを使用-->
+        <meta-data
+                android:name="com.google.android.gms.ads.APPLICATION_ID"
+                android:value="ca-app-pub-9600425381335564~7731683183"/>
     </application>
     <queries>
         <intent>
