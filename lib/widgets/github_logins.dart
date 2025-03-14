@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../screens/git_hub_auth.dart';
+import '../git_hub_auth.dart';
 
 class GithubLoginsScreen extends StatelessWidget {
   final void Function(String) onGetAccessToken;
