@@ -29,24 +29,27 @@ class _RepositoryListScreenState extends State<RepositoryListScreen> {
     return Center(
       child: Column(
         children: [
-          TextField(
-            onChanged: (value) {
-              if (value.isEmpty) {
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  showRepoList.clear();
+                  setState(() {
+                    showRepoList.addAll(widget.repoList);
+                  });
+                  return;
+                }
+
+                final resultList = widget.repoList.where(
+                  (repo) => repo.name.contains(value),
+                );
                 showRepoList.clear();
                 setState(() {
-                  showRepoList.addAll(widget.repoList);
+                  showRepoList.addAll(resultList);
                 });
-                return;
-              }
-
-              final resultList = widget.repoList.where(
-                (repo) => repo.name.contains(value),
-              );
-              showRepoList.clear();
-              setState(() {
-                showRepoList.addAll(resultList);
-              });
-            },
+              },
+            ),
           ),
           const SizedBox(height: 12),
           Expanded(

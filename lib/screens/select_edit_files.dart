@@ -1,16 +1,30 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:g_memo/models/GitHubFile.dart';
 import 'package:g_memo/screens/edit_files.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
-class SelectEditFileScreen extends StatelessWidget {
+class SelectEditFileScreen extends StatefulWidget {
   final List<GitHubFile> contents;
 
   const SelectEditFileScreen({super.key, required this.contents});
+
+  @override
+  State<SelectEditFileScreen> createState() => _SelectEditFileScreenState();
+}
+
+class _SelectEditFileScreenState extends State<SelectEditFileScreen> {
+  List<GitHubFile> showContentList = [];
+
+  @override
+  void initState() {
+    super.initState();
+    showContentList.addAll(widget.contents);
+  }
 
   Future<String?> _fetchLatestDownloadUrl(
     String owner,
@@ -32,7 +46,9 @@ class SelectEditFileScreen extends StatelessWidget {
       final jsonData = jsonDecode(response.body);
       return jsonData["download_url"];
     } else {
-      print("最新の download_url 取得失敗: ${response.statusCode}");
+      if (kDebugMode) {
+        print("最新の download_url 取得失敗: ${response.statusCode}");
+      }
       return null;
     }
   }
@@ -43,29 +59,44 @@ class SelectEditFileScreen extends StatelessWidget {
       appBar: AppBar(title: Text("編集ファイル選択")),
       body: Column(
         children: [
-          TextField(
-            onChanged: (value) {
-              if (value.isEmpty) {
-                return;
-              }
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              onChanged: (value) {
+                if (value.isEmpty) {
+                  showContentList.clear();
+                  setState(() {
+                    showContentList.addAll(widget.contents);
+                  });
+                  return;
+                }
+
+                final resultList = widget.contents.where(
+                  (repo) => repo.name.contains(value),
+                );
+                showContentList.clear();
+                setState(() {
+                  showContentList.addAll(resultList);
+                });
+              },
+            ),
           ),
           const SizedBox(height: 12),
           Expanded(
             child: ListView.builder(
-              itemCount: contents.length,
+              itemCount: showContentList.length,
               itemBuilder: (ctx, i) {
                 return Card(
                   child: ListTile(
-                    title: Text(contents[i].name),
+                    title: Text(showContentList[i].name),
                     onTap: () async {
                       print("最新の `download_url` を取得中...");
 
                       final latestDownloadUrl = await _fetchLatestDownloadUrl(
-                        contents[i].owner,
-                        contents[i].repo,
-                        contents[i].path,
-                        contents[i].token,
+                        showContentList[i].owner,
+                        showContentList[i].repo,
+                        showContentList[i].path,
+                        showContentList[i].token,
                       );
 
                       if (latestDownloadUrl == null) {
@@ -86,7 +117,8 @@ class SelectEditFileScreen extends StatelessWidget {
 
                       final directory =
                           await getApplicationDocumentsDirectory();
-                      final filePath = "${directory.path}/${contents[i].name}";
+                      final filePath =
+                          "${directory.path}/${showContentList[i].name}";
                       final file = File(filePath);
 
                       // 既存ファイル削除
@@ -99,13 +131,13 @@ class SelectEditFileScreen extends StatelessWidget {
                       await file.writeAsBytes(response.bodyBytes);
                       print("ダウンロード成功: $filePath");
 
-                      contents[i].localFile = file;
+                      showContentList[i].localFile = file;
                       //  編集画面に遷移
                       Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (ctx) {
                             return EditFileScreen(
-                              file: contents[i],
+                              file: showContentList[i],
                               onSave: (file) async {
                                 final result = await file.upload();
 
