@@ -176,6 +176,16 @@ class _EntryScreenState extends State<EntryScreen> {
       );
     }
 
-    return Scaffold(appBar: AppBar(title: Text(title)), body: mainContent);
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        actions: [
+          //  アクセストークンがある場合はログアウトボタンを表示
+          if (_accessToken != null)
+            IconButton(onPressed: _logout, icon: Icon(Icons.logout)),
+        ],
+      ),
+      body: mainContent,
+    );
   }
 }
