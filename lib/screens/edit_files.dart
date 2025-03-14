@@ -50,16 +50,21 @@ class _EditFileScreenState extends State<EditFileScreen> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
-        child: TextFormField(
-          controller: _controller,
-          maxLines: null, // 複数行に対応
-          expands: true, // 画面いっぱいに広げる
-          onChanged: (value) {
-            setState(() {
-              _controller.text = value;
-            });
-            widget.file.localFile!.writeAsString(value);
-          },
+        child: SingleChildScrollView(
+          child: TextFormField(
+            controller: _controller,
+            maxLines: null, // 複数行に対応
+            decoration: InputDecoration(
+              border: InputBorder.none, // 🔥 下線を消す
+              contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            ),
+            onChanged: (value) {
+              setState(() {
+                _controller.text = value;
+              });
+              widget.file.localFile!.writeAsString(value);
+            },
+          ),
         ),
       ),
     );
