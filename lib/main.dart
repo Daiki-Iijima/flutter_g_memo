@@ -89,15 +89,16 @@ class _EntryScreenState extends State<EntryScreen> {
       for (final repo in repos) {
         _repos.add(
           GithubRepo(
+            owner: repo["owner"]["login"],
             name: repo["name"],
             contentsUrl: repo["contents_url"].replaceAll('{+path}', ''),
             isPrivate: repo["private"] == "private",
           ),
         );
         // 検証用
-        // for (final k in repo.keys) {
-        //   print("${k.toString()} : ${repo[k.toString()]}");
-        // }
+        for (final k in repo.keys) {
+          print("${k.toString()} : ${repo[k.toString()]}");
+        }
       }
     } else {
       print("リポジトリ一覧の取得に失敗");
@@ -124,11 +125,10 @@ class _EntryScreenState extends State<EntryScreen> {
     });
   }
 
-  void _onSelectedRepositoryUrlHandler(String url) async {
-    print(url);
+  void _onSelectedRepositoryHandler(GithubRepo repo) async {
     //  ファイル一覧を取得
     final response = await http.get(
-      Uri.parse(url),
+      Uri.parse(repo.contentsUrl),
       headers: {
         "Authorization": "Bearer $_accessToken",
         "Accept": "application/vnd.github.v3+json",
@@ -143,7 +143,16 @@ class _EntryScreenState extends State<EntryScreen> {
 
     final List<dynamic> data = jsonDecode(response.body);
     final List<GitHubFile> repoFiles =
-        data.map((item) => GitHubFile.fromJson(item)).toList();
+        data
+            .map(
+              (item) => GitHubFile.fromJson(
+                owner: repo.owner,
+                repo: repo.name,
+                token: _accessToken!,
+                json: item,
+              ),
+            )
+            .toList();
 
     //  ファイル選択画面に遷移
     Navigator.of(context).push(
@@ -172,7 +181,7 @@ class _EntryScreenState extends State<EntryScreen> {
       title = "リポジトリ選択";
       mainContent = RepositoryListScreen(
         repoList: _repos,
-        onSelectedRepositoryUrl: _onSelectedRepositoryUrlHandler,
+        onSelectedRepository: _onSelectedRepositoryHandler,
       );
     }
 

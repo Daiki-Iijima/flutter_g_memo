@@ -3,12 +3,12 @@ import 'package:g_memo/models/GitHubRepo.dart';
 
 class RepositoryListScreen extends StatefulWidget {
   final List<GithubRepo> repoList;
-  final void Function(String) onSelectedRepositoryUrl;
+  final void Function(GithubRepo) onSelectedRepository;
 
   const RepositoryListScreen({
     super.key,
     required this.repoList,
-    required this.onSelectedRepositoryUrl,
+    required this.onSelectedRepository,
   });
 
   @override
@@ -57,9 +57,7 @@ class _RepositoryListScreenState extends State<RepositoryListScreen> {
                   child: ListTile(
                     title: Text(showRepoList[i].name),
                     onTap: () {
-                      widget.onSelectedRepositoryUrl(
-                        showRepoList[i].contentsUrl,
-                      );
+                      widget.onSelectedRepository(showRepoList[i]);
                     },
                   ),
                 );
