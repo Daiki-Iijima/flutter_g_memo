@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:g_memo/git_hub_auth.dart';
+import 'package:http/http.dart' as http;
 
 void main() {
   runApp(const GMemoApp());
@@ -33,6 +36,26 @@ class _GitHubLoginScreenState extends State<GitHubLoginScreen> {
     setState(() {
       _accessToken = token;
     });
+
+    //  試しにリポジトリの一覧を取得
+    final response = await http.get(
+      Uri.parse("https://api.github.com/user/repos"),
+      headers: {
+        "Authorization": "token $token",
+        "Accept": "application/vnd.github.v3+json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final repos = List<Map<String, dynamic>>.from(json.decode(response.body));
+      for (final repo in repos) {
+        for (final key in repo.keys) {
+          print(key);
+        }
+      }
+    } else {
+      print("リポジトリ一覧の取得に失敗");
+    }
   }
 
   @override
@@ -58,8 +81,12 @@ class _GitHubLoginScreenState extends State<GitHubLoginScreen> {
       child: Text("GitHub ログイン"),
     );
 
+    //  トークンがすでにあるので、リポジトリリストを取得する
     if (_accessToken != null) {
-      mainContent = Text(_accessToken!);
+      mainContent = ListView.builder(
+        itemCount: 0,
+        itemBuilder: (ctx, index) {},
+      );
     }
 
     return Scaffold(
