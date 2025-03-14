@@ -17,6 +17,7 @@ class RepositoryListScreen extends StatefulWidget {
 
 class _RepositoryListScreenState extends State<RepositoryListScreen> {
   List<GithubRepo> showRepoList = [];
+  final _searchFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -32,6 +33,7 @@ class _RepositoryListScreenState extends State<RepositoryListScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: _searchFieldController,
               onChanged: (value) {
                 if (value.isEmpty) {
                   showRepoList.clear();
@@ -49,6 +51,19 @@ class _RepositoryListScreenState extends State<RepositoryListScreen> {
                   showRepoList.addAll(resultList);
                 });
               },
+              decoration: InputDecoration(
+                label: Text("リポジトリ名"),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    _searchFieldController.clear();
+                    showRepoList.clear();
+                    setState(() {
+                      showRepoList.addAll(widget.repoList);
+                    });
+                  },
+                  icon: Icon(Icons.clear),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 12),

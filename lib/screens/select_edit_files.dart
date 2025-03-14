@@ -19,6 +19,7 @@ class SelectEditFileScreen extends StatefulWidget {
 
 class _SelectEditFileScreenState extends State<SelectEditFileScreen> {
   List<GitHubFile> showContentList = [];
+  final _searchFieldController = TextEditingController();
 
   @override
   void initState() {
@@ -62,6 +63,7 @@ class _SelectEditFileScreenState extends State<SelectEditFileScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: TextField(
+              controller: _searchFieldController,
               onChanged: (value) {
                 if (value.isEmpty) {
                   showContentList.clear();
@@ -79,6 +81,19 @@ class _SelectEditFileScreenState extends State<SelectEditFileScreen> {
                   showContentList.addAll(resultList);
                 });
               },
+              decoration: InputDecoration(
+                label: Text("リポジトリ名"),
+                suffixIcon: IconButton(
+                  onPressed: () {
+                    _searchFieldController.clear();
+                    showContentList.clear();
+                    setState(() {
+                      showContentList.addAll(widget.contents);
+                    });
+                  },
+                  icon: Icon(Icons.clear),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 12),
