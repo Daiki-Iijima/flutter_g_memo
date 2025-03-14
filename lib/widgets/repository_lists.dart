@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:g_memo/models/GitHubRepo.dart';
 
 class RepositoryListScreen extends StatefulWidget {
-  final List<String> repoList;
-  final void Function() onLogout;
+  final List<GithubRepo> repoList;
+  final void Function(String) onSelectedRepositoryUrl;
 
   const RepositoryListScreen({
     super.key,
     required this.repoList,
-    required this.onLogout,
+    required this.onSelectedRepositoryUrl,
   });
 
   @override
@@ -15,7 +16,7 @@ class RepositoryListScreen extends StatefulWidget {
 }
 
 class _RepositoryListScreenState extends State<RepositoryListScreen> {
-  List<String> showRepoList = [];
+  List<GithubRepo> showRepoList = [];
 
   @override
   void initState() {
@@ -39,7 +40,7 @@ class _RepositoryListScreenState extends State<RepositoryListScreen> {
               }
 
               final resultList = widget.repoList.where(
-                (name) => name.contains(value),
+                (repo) => repo.name.contains(value),
               );
               showRepoList.clear();
               setState(() {
@@ -53,7 +54,14 @@ class _RepositoryListScreenState extends State<RepositoryListScreen> {
               itemCount: showRepoList.length,
               itemBuilder: (ctx, i) {
                 return Card(
-                  child: ListTile(title: Text(showRepoList[i]), onTap: () {}),
+                  child: ListTile(
+                    title: Text(showRepoList[i].name),
+                    onTap: () {
+                      widget.onSelectedRepositoryUrl(
+                        showRepoList[i].contentsUrl,
+                      );
+                    },
+                  ),
                 );
               },
             ),

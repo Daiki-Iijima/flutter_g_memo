@@ -2,10 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:g_memo/git_hub_auth.dart';
-import 'package:g_memo/github_logins.dart';
-import 'package:g_memo/repository_lists.dart';
+import 'package:g_memo/models/GitHubFile.dart';
+import 'package:g_memo/screens/git_hub_auth.dart';
+import 'package:g_memo/widgets/github_logins.dart';
+import 'package:g_memo/widgets/repository_lists.dart';
+import 'package:g_memo/screens/select_edit_files.dart';
 import 'package:http/http.dart' as http;
+
+import 'models/GitHubRepo.dart';
 
 void main() {
   runApp(const GMemoApp());
@@ -33,7 +37,7 @@ class _EntryScreenState extends State<EntryScreen> {
   static const _githubTokenKey = "github_token";
   var _loadingRepos = false;
 
-  final List<String> _repos = [];
+  final List<GithubRepo> _repos = [];
 
   Future<void> _loadAccessToken() async {
     final token = await _storage.read(key: _githubTokenKey);
@@ -83,7 +87,17 @@ class _EntryScreenState extends State<EntryScreen> {
     if (response.statusCode == 200) {
       final repos = List<Map<String, dynamic>>.from(json.decode(response.body));
       for (final repo in repos) {
-        _repos.add(repo["name"].toString());
+        _repos.add(
+          GithubRepo(
+            name: repo["name"],
+            contentsUrl: repo["contents_url"].replaceAll('{+path}', ''),
+            isPrivate: repo["private"] == "private",
+          ),
+        );
+        // 検証用
+        // for (final k in repo.keys) {
+        //   print("${k.toString()} : ${repo[k.toString()]}");
+        // }
       }
     } else {
       print("リポジトリ一覧の取得に失敗");
@@ -110,6 +124,37 @@ class _EntryScreenState extends State<EntryScreen> {
     });
   }
 
+  void _onSelectedRepositoryUrlHandler(String url) async {
+    print(url);
+    //  ファイル一覧を取得
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        "Authorization": "Bearer $_accessToken",
+        "Accept": "application/vnd.github.v3+json",
+      },
+    );
+
+    if (response.statusCode != 200) {
+      print("リポジトリ内ファイルの取得に失敗: ${response.statusCode}");
+      print("エラー詳細: ${response.body}"); // ← 追加
+      return;
+    }
+
+    final List<dynamic> data = jsonDecode(response.body);
+    final List<GitHubFile> repoFiles =
+        data.map((item) => GitHubFile.fromJson(item)).toList();
+
+    //  ファイル選択画面に遷移
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (ctx) {
+          return SelectEditFileScreen(contents: repoFiles);
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var title = "G Memo";
@@ -125,7 +170,10 @@ class _EntryScreenState extends State<EntryScreen> {
 
     if (_accessToken != null && !_loadingRepos) {
       title = "リポジトリ選択";
-      mainContent = RepositoryListScreen(repoList: _repos, onLogout: _logout);
+      mainContent = RepositoryListScreen(
+        repoList: _repos,
+        onSelectedRepositoryUrl: _onSelectedRepositoryUrlHandler,
+      );
     }
 
     return Scaffold(appBar: AppBar(title: Text(title)), body: mainContent);
