@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../git_hub_auth.dart';
 
@@ -17,10 +18,31 @@ class GithubLoginsScreen extends StatelessWidget {
     onGetAccessToken(token);
   }
 
+  void _launchPrivacyPolicyURL() async {
+    final Uri url = Uri.parse(
+      'https://obtainable-join-42d.notion.site/GMemo-Privacy-Policy-1b7d3fb892128027a84dd5df9ffea0af?pvs=4',
+    );
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: ElevatedButton(onPressed: _login, child: Text("GitHub ログイン")),
+      child: Column(
+        children: [
+          const Spacer(),
+          ElevatedButton(onPressed: _login, child: Text("GitHub ログイン")),
+          const Spacer(),
+          TextButton(
+            onPressed: _launchPrivacyPolicyURL,
+            child: Text("Privacy Policy"),
+          ),
+        ],
+      ),
     );
   }
 }

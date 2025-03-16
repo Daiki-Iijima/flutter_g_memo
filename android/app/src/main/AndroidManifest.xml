@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-            android:label="g_memo"
+            android:label="GitMemo"
             android:name="${applicationName}"
             android:icon="@mipmap/ic_launcher">
         <activity
@@ -22,16 +22,16 @@
                 android:name="com.linusu.flutter_web_auth_2.CallbackActivity"
                 android:exported="true">
             <intent-filter android:label="flutter_web_auth_2">
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="gmemo" />
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="gmemo"/>
             </intent-filter>
         </activity>
 
         <meta-data
                 android:name="flutterEmbedding"
-                android:value="2" />
+                android:value="2"/>
 
         <!-- AdMob用 -->
         <!--        とりあえずテスト広告用idを使用-->

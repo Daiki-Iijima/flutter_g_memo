@@ -25,7 +25,11 @@ class GMemoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'GitHub Memo', home: EntryScreen());
+    return MaterialApp(
+      title: 'GitHub Memo',
+      debugShowCheckedModeBanner: false,
+      home: EntryScreen(),
+    );
   }
 }
 
